@@ -29,39 +29,61 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
+  void showCounterDialog(BuildContext context, int counter) {
+    print(context);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Container(
+          child: AlertDialog(
+            content: Text('counter is $counter'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Cancel'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void navigateToOtherPage(BuildContext context) {
+    print(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return OtherPage();
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<CounterCubit, CounterState>(
+      body: BlocListener<CounterCubit, CounterState>(
         listener: (context, state) {
           if (state.counter == 3) {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: Text('counter is ${state.counter}'),
-                );
-              },
-            );
+            showCounterDialog(context, state.counter);
           } else if (state.counter == -1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return OtherPage();
-                },
-              ),
-            );
+            navigateToOtherPage(context);
           }
         },
-        builder: (context, state) {
-          return Center(
-            child: Text(
-              '${state.counter}',
-              style: TextStyle(fontSize: 52.0),
-            ),
-          );
-        },
+        child: BlocBuilder<CounterCubit, CounterState>(
+          builder: (context, state) {
+            return Center(
+              child: Text(
+                '${state.counter}',
+                style: TextStyle(fontSize: 52.0),
+              ),
+            );
+          },
+        ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
