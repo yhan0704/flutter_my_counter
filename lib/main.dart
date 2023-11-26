@@ -66,7 +66,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<CounterCubit, CounterState>(
+      body: BlocConsumer<CounterCubit, CounterState>(
         listener: (context, state) {
           if (state.counter == 3) {
             showCounterDialog(context, state.counter);
@@ -74,23 +74,22 @@ class MyHomePage extends StatelessWidget {
             navigateToOtherPage(context);
           }
         },
-        child: BlocBuilder<CounterCubit, CounterState>(
-          builder: (context, state) {
-            return Center(
-              child: Text(
-                '${state.counter}',
-                style: TextStyle(fontSize: 52.0),
-              ),
-            );
-          },
-        ),
+        builder: (context, state) {
+          return Center(
+            child: Text(
+              '${state.counter}',
+              style: TextStyle(fontSize: 52.0),
+            ),
+          );
+        },
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
             onPressed: () {
-              BlocProvider.of<CounterCubit>(context).increment();
+              // BlocProvider.of<CounterCubit>(context).increment();
+              context.read<CounterCubit>().increment();
             },
             child: Icon(Icons.add),
             heroTag: 'increment',
@@ -98,7 +97,8 @@ class MyHomePage extends StatelessWidget {
           SizedBox(width: 10.0),
           FloatingActionButton(
             onPressed: () {
-              BlocProvider.of<CounterCubit>(context).decrement();
+              // BlocProvider.of<CounterCubit>(context).decrement();
+              context.watch<CounterCubit>().decrement();
             },
             child: Icon(Icons.remove),
             heroTag: 'decrement',
