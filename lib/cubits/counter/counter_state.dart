@@ -1,23 +1,21 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'counter_cubit.dart';
 
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 class CounterState {
   final int counter;
   CounterState({
     required this.counter,
   });
 
-
-  factory CounterState.initial(){
+  factory CounterState.initial() {
     return CounterState(counter: 0);
   }
 
   @override
   bool operator ==(covariant CounterState other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.counter == counter;
+
+    return other.counter == counter;
   }
 
   @override

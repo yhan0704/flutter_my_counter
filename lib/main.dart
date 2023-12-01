@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_counter_cubit/cubits/color/color_cubit.dart';
 import 'package:my_counter_cubit/cubits/counter/counter_cubit.dart';
-import 'package:my_counter_cubit/other_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,10 +12,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<CounterCubit>(
-      create: (context) => CounterCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ColorCubit>(
+          create: (context) => ColorCubit(),
+        ),
+        BlocProvider<CounterCubit>(
+          create: (context) => CounterCubit(
+            colorCubit: context.read<ColorCubit>(),
+          ),
+        ),
+      ],
       child: MaterialApp(
-        title: 'My Counter Cubit',
+        title: 'cubit2cubit',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
@@ -29,81 +38,44 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
-  void showCounterDialog(BuildContext context, int counter) {
-    print(context);
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Container(
-          child: AlertDialog(
-            content: Text('counter is $counter'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('Cancel'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void navigateToOtherPage(BuildContext context) {
-    print(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return OtherPage();
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<CounterCubit, CounterState>(
-        listener: (context, state) {
-          if (state.counter == 3) {
-            showCounterDialog(context, state.counter);
-          } else if (state.counter == -1) {
-            navigateToOtherPage(context);
-          }
-        },
-        builder: (context, state) {
-          return Center(
-            child: Text(
-              '${state.counter}',
-              style: TextStyle(fontSize: 52.0),
+      backgroundColor: context.watch<ColorCubit>().state.color,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              child: Text(
+                'Change Color',
+                style: TextStyle(fontSize: 24.0),
+              ),
+              onPressed: () {
+                context.read<ColorCubit>().changeColor();
+              },
             ),
-          );
-        },
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              // BlocProvider.of<CounterCubit>(context).increment();
-              context.read<CounterCubit>().increment();
-            },
-            child: Icon(Icons.add),
-            heroTag: 'increment',
-          ),
-          SizedBox(width: 10.0),
-          FloatingActionButton(
-            onPressed: () {
-              // BlocProvider.of<CounterCubit>(context).decrement();
-              context.watch<CounterCubit>().decrement();
-            },
-            child: Icon(Icons.remove),
-            heroTag: 'decrement',
-          ),
-        ],
+            SizedBox(height: 20.0),
+            Text(
+              '${context.watch<CounterCubit>().state.counter}',
+              style: TextStyle(
+                fontSize: 52.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              child: Text(
+                'Increment Counter',
+                style: TextStyle(fontSize: 24.0),
+              ),
+              onPressed: () {
+                context.read<CounterCubit>().changeCounter();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
